@@ -7,7 +7,7 @@
 Управление прокруткой изображений осуществляется с помощью кнопока "Up", "Down", "^" и "v" на пульте дистанционного управления телевизором. 
 После 15-ти секунд бездействия пользователя приложение переходит в режим "бесконечной прокрутки".
 
-Панель управления изображениями доступна по адресу http://technolingva.ru/tools/slider/uploader.php.
+Панель управления изображениями доступна по адресу http://technolingva.ru/tools/slider
 
 
 
@@ -22,4 +22,4 @@ Supports the displaying of 3 images.
 The scrolling of images is controlled by "Up", "Down", "^" and "v" buttons on the TV remote control.
 After 15 seconds of user inactivity, the application switches to the "infinite scrolling" mode.
 
-The image Control panel is available at http://technolingva.ru/tools/slider/uploader.php .
+The image Control panel is available at http://technolingva.ru/tools/slider
