@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Administration Panel</title>
+	<style type="text/css">
+		body, .wrap, #slider, .slide-content {
+			margin:0;
+			padding:0;
+			font-family: Arial, Helvetica, sans-serif;
+			width: 100%;
+			height: 100vh;	
+			overflow-x: hidden;
+		}
+		h1 {
+			display: table-cell;
+			vertical-align: middle;
+			text-align: center;
+			color: #FFFFFF;			
+		}
+		.wrap {	position: relative;	}
+		.slide {
+			position: absolute;	
+			width: 100%;			
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+		.slide-content {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			z-index: 50;
+		}
+		.slide-content span {
+			font-size: 5rem;
+			color: #fff;
+		}
+		.arrow {
+			cursor: pointer;
+			position: absolute;
+			top: 50%;
+			margin-top: -35px;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			z-index: 50;
+		}
+		#arrow-left {
+			border-width: 30px 40px 30px 0;
+			border-color: transparent #fff transparent transparent;
+			left: 0;
+			margin-left: 30px;						
+		}
+		#arrow-right {
+			border-width: 30px 0 30px 40px;
+			border-color: transparent transparent transparent #fff;
+			right: 0;
+			margin-right: 30px;
+		}		
+		#msg {
+			position: absolute;
+			top: 50px;
+			left: 350px;
+			color: cyan;
+			font-size: 32px;
+			z-index: 100;		
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrap">
+		<div id="arrow-left" class="arrow"></div>
+		<div id="slider">
+			<div class="slide slide1">
+				<div class="slide-content">
+					<span>Image 1</span>
+				</div>
+			</div>
+			<div class="slide slide2">
+				<div class="slide-content">
+					<span>Image 2</span>
+				</div>
+			</div>
+			<div class="slide slide3">
+				<div class="slide-content">
+					<span>Image 3</span>
+				</div>
+			</div>				
+		</div>
+		<div id="arrow-right" class="arrow"></div>	
+	</div>		
+	<div id="msg"></div>
+
+<script src="webOSTVjs-1.2.4/webOSTV.js" charset="utf-8"></script>
+<script src="webOSTVjs-1.2.4/webOSTV-dev.js" charset="utf-8"></script>
+<script type="text/javascript">
+	//sample code for calling LS2 API
+	webOS.service.request("luna://com.palm.systemservice", {
+		method: "clock/getTime",
+		parameters: {},
+		onSuccess: function (args) {
+			console.log("UTC:", args.utc);
+		},
+		onFailure: function (args) {
+			console.log("Failed to getTime");
+		}
+	});
+	
+let running;	
+let sliderImages = document.querySelectorAll('.slide');
+let arrowLeft    = document.querySelector('#arrow-left');	
+let arrowRight   = document.querySelector('#arrow-right');	
+let current      = 0;
+
+let img1 = document.createElement('img');
+img1.src = "http://technolingva.ru/tools/slider/upload/img1.jpg"; 
+sliderImages[0].style.backgroundImage = "url('" + img1.src + "')";
+img1.onerror = function() { sliderImages[0].style.backgroundImage = "url('img1.jpg')" };
+
+let img2 = document.createElement('img');
+img2.src = "http://technolingva.ru/tools/slider/upload/img2.jpg"; 
+sliderImages[1].style.backgroundImage = "url('" + img2.src + "')";
+img2.onerror = function() { sliderImages[1].style.backgroundImage = "url('img2.jpg')" };
+
+let img3 = document.createElement('img');
+img3.src = "http://technolingva.ru/tools/slider/upload/img3.jpg"; 
+sliderImages[2].style.backgroundImage = "url('" + img3.src + "')";
+img3.onerror = function() { sliderImages[2].style.backgroundImage = "url('img3.jpg')" };
+
+// Init slider 
+function startSlide() {
+	reset();
+	sliderImages[0].style.display = 'block';
+	sliderImages[0].style.top = '0';
+}
+
+// Reset slider
+function reset() {
+	var idx = 0;
+	for(let i=0; i<sliderImages.length; ++i) 
+		if(sliderImages[i].style.display === 'block') idx = i; 
+	
+	for(let i=0; i<sliderImages.length; ++i) {	 
+		if(i === idx) continue;		
+		sliderImages[i].style.display = 'none';
+	}	
+}	
+	
+// Show previous image	
+function slideLeft() {  
+	var tmp = (current === sliderImages.length) ? 0 : current;	
+	reset();
+
+	sliderImages[tmp].style.zIndex = '0';	
+	sliderImages[current - 1].style.zIndex  = '10';
+	sliderImages[current - 1].style.display = 'block';
+	
+	fadeIn(sliderImages[current - 1]);
+	
+	setTimeout(function() { sliderImages[tmp].style.display = 'none';  }, 1100);	
+	--current;
+}
+
+// Show next image	
+function slideRight() {
+	var tmp = (current === -1) ? sliderImages.length - 1 : current; 
+	reset();	
+
+	sliderImages[tmp].style.zIndex = '0';	
+	sliderImages[current + 1].style.zIndex  = '10';
+	sliderImages[current + 1].style.display = 'block';
+	
+	fadeIn(sliderImages[current + 1]);
+
+	setTimeout(function() { sliderImages[tmp].style.display = 'none';  }, 1100);	
+	++current;	
+}
+
+document.addEventListener("keydown", function(inEvent){
+    // var message = "Keycode: <lg_red>" + inEvent.keyCode + "</lg_red>";
+    // document.getElementById("msg").innerHTML = message;
+	
+	clearInterval(running);	
+	
+	if(inEvent.keyCode == 33 || inEvent.keyCode == 38) {
+		if(current === 0)
+			current = sliderImages.length;
+		slideLeft();	
+		
+		runInfinity();	
+	}
+
+	if(inEvent.keyCode == 34 || inEvent.keyCode == 40) {
+		if(current === sliderImages.length - 1)
+			current = -1;
+		slideRight();
+
+		runInfinity();			
+	}	
+});
+
+
+function fadeIn(slide) {
+  let scrnHeight = window.screen.height;
+  let ratio = 1000 / scrnHeight;
+
+  slide.style.top = -scrnHeight + 'px'; 
+
+  let start = Date.now();
+  let top = slide.offsetTop;   
+
+  let timer = setInterval(function() {   
+	let timePassed = Date.now() - start;
+	slide.style.top = ((timePassed / ratio) + top) + 'px'; 
+	if (timePassed > 1000 || slide.offsetTop >= 0) {
+		clearInterval(timer);
+		slide.style.top = 0;
+	}	
+  }, 3);  
+}	
+
+function runInfinity() {		
+	running = setInterval(function() {
+		if(current === sliderImages.length - 1)
+			current = -1;	
+			
+		slideRight();			
+	}, 15000);
+}
+	
+startSlide();
+runInfinity();
+</script>	
+
+</body>
+</html>
